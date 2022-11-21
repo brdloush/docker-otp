@@ -1,16 +1,22 @@
-FROM java:8-alpine
-LABEL maintainer="Stepan Kuzmin <to.stepan.kuzmin@gmail.com>"
+FROM openjdk:19-jdk-alpine3.16
+LABEL maintainer="Tomas Brejla <brdloush@gmail.com>"
 
-ENV OTP_VERSION=1.4.0
+ENV OTP_VERSION=1.5.0
 ENV JAVA_OPTIONS=-Xmx1G
 
-ADD http://central.maven.org/maven2/org/opentripplanner/otp/$OTP_VERSION/otp-$OTP_VERSION-shaded.jar /usr/local/share/java/
+RUN mkdir /opt/otp
 
-RUN ln -s otp-$OTP_VERSION-shaded.jar /usr/local/share/java/otp.jar
+ADD https://repo1.maven.org/maven2/org/opentripplanner/otp/1.5.0/otp-1.5.0-shaded.jar /opt/otp/
+ADD https://repo1.maven.org/maven2/org/python/jython-standalone/2.7.3/jython-standalone-2.7.3.jar /opt/otp/
+ADD otp /opt/otp/
+
+RUN ln -s /opt/otp/otp-1.5.0-shaded.jar /opt/otp/otp.jar
 
 COPY otp /usr/local/bin/
 
 EXPOSE 8080
+
+WORKDIR /opt/otp
 
 ENTRYPOINT ["otp"]
 CMD ["--help"]
